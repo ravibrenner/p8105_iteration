@@ -1,0 +1,11 @@
+---
+title: "Writing Funcitons"
+author: "Ravi Brenner"
+date: "2024-10-27"
+output: github_document
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```

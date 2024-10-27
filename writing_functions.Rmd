@@ -8,4 +8,147 @@ output: github_document
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(rvest)
+set.seed(1)
 ```
+
+## Basic function
+
+First, very basic function. Standardize normal distribution / create Z scores
+
+```{r}
+x_vec <- rnorm(25, mean = 5, sd = 3)
+
+(x_vec - mean(x_vec)) / sd(x_vec)
+```
+
+```{r}
+z_scores <- function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Z scores cannot be computed for vectors of length 1")
+  }
+  z = (x - mean(x)) / sd(x)
+  z
+}
+
+z_scores(x_vec)
+```
+
+## Multiple outputs
+
+List
+```{r}
+mean_and_sd <- function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Cannot be computed for vectors of length 1")
+  }
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  list(mean = mean_x,
+       sd = sd_x)
+}
+
+mean_and_sd(x_vec)
+```
+
+or store in dataframe
+```{r}
+mean_and_sd <- function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Cannot be computed for vectors of length 1")
+  }
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  tibble(
+    mean = mean_x,
+    sd = sd_x)
+}
+
+mean_and_sd(x_vec)
+```
+
+## multiple inputs
+
+```{r}
+sim_data <- tibble(
+  x = rnorm(30,mean = 2, sd = 3)
+)
+
+sim_data |>
+  summarize(
+    mu_hat = mean(x),
+    sigma_hat = sd(x)
+  )
+```
+
+Create function
+```{r}
+sim_mean_sd <- function(n, mu = 2, sigma = 3) {
+  
+  sim_data <- tibble(
+    x = rnorm(n, mean = mu, sd = sigma)
+  )
+  
+  sim_data |>
+    summarize(
+      mu_hat = mean(x),
+      sigma_hat = sd(x)
+    )
+}
+
+sim_mean_sd(n = 300)
+```
+
+## worked example
+```{r}
+fellowship_ring = readxl::read_excel("./data/LotR_Words.xlsx", range = "B3:D6") |>
+  mutate(movie = "fellowship_ring")
+
+two_towers = readxl::read_excel("./data/LotR_Words.xlsx", range = "F3:H6") |>
+  mutate(movie = "two_towers")
+
+return_king = readxl::read_excel("./data/LotR_Words.xlsx", range = "J3:L6") |>
+  mutate(movie = "return_king")
+
+lotr_tidy = bind_rows(fellowship_ring, two_towers, return_king) |>
+  janitor::clean_names() |>
+  pivot_longer(
+    female:male,
+    names_to = "sex",
+    values_to = "words") |> 
+  mutate(race = str_to_lower(race)) |> 
+  select(movie, everything())
+```
+
+Learning Assessment: Try to write a function that can be used to abstract the data loading and cleaning process. Use this function to recreate the tidied LoTR dataset.
+
+```{r}
+lotr_load_and_tidy <- function(path, range, movie_name) {
+  readxl::read_excel(path, range = range) |>
+    mutate(movie = movie_name) |>
+    janitor::clean_names() |>
+    pivot_longer(female:male, 
+                 names_to = "sex", 
+                 values_to = "words") |>
+    mutate(race = str_to_lower(race)) |>
+    select(movie, everything())
+}
+
+lotr_tidy <- lotr_load_and_tidy("./data/LotR_Words.xlsx","B3:D6",
+                               "fellowship_ring") |>
+  bind_rows(lotr_load_and_tidy("./data/LotR_Words.xlsx","F3:H6",
+                               "two_towers")) |>
+  bind_rows(lotr_load_and_tidy("./data/LotR_Words.xlsx","J3:L6",
+                               "return_king"))
+```
+

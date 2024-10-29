@@ -1,0 +1,89 @@
+---
+title: "Iteration and Listcols"
+author: "Ravi Brenner"
+date: "2024-10-29"
+output: github_document
+---
+
+```{r setup, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(rvest)
+set.seed(1)
+```
+
+## some lists
+```{r}
+l <- list(
+  vec_numeric = 1:4,
+  unif_sample = runif(100),
+  mat = matrix(1:8, nrow = 2, ncol = 4, byrow = TRUE),
+  summary = summary(rnorm(1000))
+)
+
+l
+
+#ways to access elements of the list
+l$mat
+l[["mat"]]
+l[[3]]
+```
+
+make a list that's a bit more useful
+```{r}
+list_norm = 
+  list(
+    a = rnorm(20, 0, 5),
+    b = rnorm(20, 4, 5),
+    c = rnorm(20, 0, 10),
+    d = rnorm(20, 4, 10)
+  )
+
+list_norm[["b"]]
+```
+
+reuse a function we wrote last time
+```{r}
+mean_and_sd <- function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Cannot be computed for vectors of length 1")
+  }
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  tibble(
+    mean = mean_x,
+    sd = sd_x)
+}
+```
+
+use the function to take mean and sd of all samples
+```{r}
+mean_and_sd(list_norm[["a"]])
+mean_and_sd(list_norm[["b"]])
+mean_and_sd(list_norm[["c"]])
+mean_and_sd(list_norm[["d"]])
+```
+
+## use a for loop
+Could turn this into a loop (especially if we have a much larger list)
+
+create output list, and run a for loop
+```{r}
+output <- vector("list", length = 4)
+
+for (i in 1:4){
+  output[[i]] = mean_and_sd(list_norm[[i]])
+}
+```
+
+And better yet, turn that loop into a map function
+
+```{r}
+output = map(list_norm, mean_and_sd)
+```
+
+
+

@@ -79,11 +79,31 @@ for (i in 1:4){
 }
 ```
 
-And better yet, turn that loop into a map function
+And better yet, turn that loop into a `map` function
 
 ```{r}
 output = map(list_norm, mean_and_sd)
 ```
+
+try a few other things
+
+can use any function
+```{r}
+output = map(list_norm, IQR)
+output
+```
+
+can map_TO specific things
+```{r}
+output = map_dbl(list_norm, IQR)
+output
+
+output = map_dfr(list_norm, mean_and_sd)
+output
+```
+
+## List columns
+
 
 
 

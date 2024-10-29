@@ -168,8 +168,54 @@ for (i in 1:4){
 }
 ```
 
-And better yet, turn that loop into a map function
+And better yet, turn that loop into a `map` function
 
 ``` r
 output = map(list_norm, mean_and_sd)
 ```
+
+try a few other things
+
+can use any function
+
+``` r
+output = map(list_norm, IQR)
+output
+```
+
+    ## $a
+    ## [1] 8.73998
+    ## 
+    ## $b
+    ## [1] 5.217825
+    ## 
+    ## $c
+    ## [1] 10.5479
+    ## 
+    ## $d
+    ## [1] 8.754516
+
+can map_TO specific things
+
+``` r
+output = map_dbl(list_norm, IQR)
+output
+```
+
+    ##         a         b         c         d 
+    ##  8.739980  5.217825 10.547902  8.754516
+
+``` r
+output = map_dfr(list_norm, mean_and_sd)
+output
+```
+
+    ## # A tibble: 4 × 2
+    ##     mean    sd
+    ##    <dbl> <dbl>
+    ## 1 -0.622  6.37
+    ## 2  4.08   4.46
+    ## 3  0.847 10.0 
+    ## 4  0.119  8.86
+
+## List columns
